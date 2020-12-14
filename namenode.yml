@@ -1,0 +1,71 @@
+- hosts: master
+  tasks:
+  - name: "Copying the Hadoop File"
+    copy:
+     src: "/root/hadoop-1.2.1-1.x86_64.rpm"
+     dest: "/root/"
+  - name: "Copying the JDK File"
+    copy:
+     src: "/root/jdk-8u171-linux-x64.rpm"
+     dest: "/root/"
+  - name:  "Installing Jdk"
+    shell: "rpm -ivh jdk-8u171-linux-x64.rpm"
+    register: Java
+    ignore_errors: yes
+  - name: "Java Installation"
+    debug:
+      var: Java.stdout
+  - name: "Installing Hadoop"
+    shell: "rpm -ivh hadoop-1.2.1-1.x86_64.rpm --force"
+    register: Hadoop
+    ignore_errors: yes
+  - name: "Hadoop Installation"
+    debug:
+      var: Hadoop.stdout
+  - name: "Copying the core-site.xml file"
+    copy:
+     src: "/root/namenode_files/core-site.xml"
+     dest: "/etc/hadoop/core-site.xml"
+  - name: "Copying the hdfs-site.xml file"
+    copy:
+     src: "/root/namenode_files/hdfs-site.xml"
+     dest: "/etc/hadoop/hdfs-site.xml"
+  - name: "Deleting the directory"
+    shell: "rm -rf /nn"
+    ignore_errors: "yes"
+  - name: "Creating a directory"
+    file:
+     state: directory
+     path: "/nn"
+  - name: "Formatting the directory"
+    shell: "echo Y | hadoop namenode -format"
+    register: format
+  - name: "Formating NameNode"
+    debug:
+     var: format.stdout
+  - name: "Stoping the namenode"
+    shell: "hadoop-daemon.sh stop namenode"
+    ignore_errors: yes
+    register: hadoop_stopped
+  - name: "Stopping hadoop"
+    debug:
+      var: hadoop_stopped.stdout
+  - name: "Starting the namenode"
+    shell: "hadoop-daemon.sh start namenode"
+    ignore_errors: yes
+    register: hadoop_started
+  - name: "Started hadoop"
+    debug:
+      var: hadoop_started.stdout
+  - name: "Java Process"
+    shell: "jps"
+    register: jps
+  - name: "Java Process"
+    shell: "jps"
+    register: jps
+  - name: "Java Process"
+    debug:
+      var: jps.stdout
+
+      
+
