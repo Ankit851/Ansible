@@ -1,0 +1,18 @@
+- hosts: webserver
+  tasks:
+  - name: "Installing apache webserver"
+    package:
+     name: "httpd"
+     state: present
+
+  - name: "Deploying the Webpages"
+    copy:
+     src: "/root/web.html"
+     dest: "/var/www/html/web.html"
+    notify: web services
+
+  handlers:
+  - name: webservices
+    service:
+      name: web services
+      state: "restarted"
