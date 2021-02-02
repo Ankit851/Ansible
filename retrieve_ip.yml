@@ -1,0 +1,22 @@
+- hosts: localhost
+  tasks:
+  - name: Stopping Selinux Services
+    ansible.posix.selinux:
+      policy: targeted
+      state:  permissive
+  
+  - name: Retrieving Docker Container IP
+    community.general.docker_container_info:
+      name:  "httpdOS"
+    register: x
+
+  - debug:
+      var: x.container.NetworkSettings.IPAddress
+
+  - name: Updating inventory file by Docker Container IP
+    blockinfile:
+            dest:  "/root/ip.txt"
+            block:  |
+                     [docker]
+                     {{ x['container']['NetworkSettings']['IPAddress'] }} ansible_user=root ansible_ssh_pass=redhat ansible_connection=ssh
+
